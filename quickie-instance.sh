@@ -13,18 +13,15 @@
 # $2 is the name to give the running instance; default is the image name with a random string appended
 # $3 is the instance flavor to create; default is to make it a tiny
 # $4 is the cloud-init script; default is none
-
-# user asking for help?
-if [ "$1" == "-h" ]; then
+if [ "$1" == "-h" ] || [ "$1" == "-?" ] || [ "$1" == "--help" ]; then
   echo
-  echo '    $1 is the name of the image to boot otherwise use the latest CentOS-7 image'
-  echo '    $2 is the name to give the running instance; default is the image name with a random string appended'
-  echo '    $3 is the instance flavor to create; default is to make it a tiny'
-  echo '    $4 is the cloud-init script; default is none'
+  echo "   \$1 is the name of the image to boot otherwise use the latest CentOS-7 image"
+  echo "   \$2 is the name to give the running instance; default is the image name with a random string appended"
+  echo "   \$3 is the instance flavor to create; default is to make it a tiny"
+  echo "   \$4 is the cloud-init script; default is none"
   echo
-  exit
+  exit 0
 fi
-
 
 set -o pipefail
 ExitStatus=0
@@ -50,6 +47,7 @@ watch-ip()
   done ; 
   echo -e  "after $et sec, it's alive\041\041\041\007\n"
 }
+
 
 # $1 is the name of the image to boot; otherwise, use the latest CentOS-7 image
 # need better error exit - geo
@@ -88,7 +86,7 @@ Step="creating instance name"
 ExitStatus=$((ExitStatus+1))
 TMPFILE=`mktemp XXXXXX` || exit ${ExitStatus}
 if [ "$2" != "" ]; then
-  INSTANCENAME="$2"
+  INSTANCENAME="$1"
   FILENAME=`echo "./$2-quickie-${TMPFILE}.txt" | tr '[:upper:]' '[:lower:]'`
 else
   TMPFILE0=`echo "${TMPFILE}" | tr '[:upper:]' '[:lower:]'`
@@ -227,12 +225,9 @@ date | tee -a ${FILENAME}
 echo "Seconds to start = $dt" | tee -a ${FILENAME}
 echo | tee -a ${FILENAME}
 echo | tee -a ${FILENAME}
-echo "A file named Qenv.sh has been created ready to define the environment variables Qserver and Qip if needed" | tee -a ${FILENAME}
-echo | tee -a ${FILENAME}
-echo | tee -a ${FILENAME}
 
 #echo qServer,Qip ${Qserver} ${Qip}
-# need to explain & document this
+
 Step="export environment state"
 ExitStatus=$((ExitStatus+1))
 TMPFILE2=`mktemp XXXXXX` || exit ${ExitStatus}
